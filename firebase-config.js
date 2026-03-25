@@ -1,35 +1,23 @@
-import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
-import { getAuth, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
-import { getFirestore } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+<script type="module">
+  // Import the functions you need from the SDKs you need
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
+  import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-analytics.js";
+  // TODO: Add SDKs for Firebase products that you want to use
+  // https://firebase.google.com/docs/web/setup#available-libraries
 
-/**
- * Substitua pelos dados do seu projeto Firebase.
- * Este arquivo pode ficar versionado normalmente no GitHub Pages ou na Vercel.
- */
-export const firebaseConfig = {
-  apiKey: "COLE_AQUI",
-  authDomain: "COLE_AQUI.firebaseapp.com",
-  projectId: "COLE_AQUI",
-  storageBucket: "COLE_AQUI.firebasestorage.app",
-  messagingSenderId: "COLE_AQUI",
-  appId: "COLE_AQUI"
-};
+  // Your web app's Firebase configuration
+  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+  const firebaseConfig = {
+    apiKey: "AIzaSyD9zO7KYM7ALgLnzgdZr3IiiJyu1M-aYWk",
+    authDomain: "stilo-premium.firebaseapp.com",
+    projectId: "stilo-premium",
+    storageBucket: "stilo-premium.firebasestorage.app",
+    messagingSenderId: "998169786088",
+    appId: "1:998169786088:web:1764eacd99eeb926547b5d",
+    measurementId: "G-7NFZ9MDJ70"
+  };
 
-/**
- * O sistema foi oficialmente fixado em America/Sao_Paulo para evitar divergência
- * entre interface, agenda, persistência e painel administrativo.
- */
-export const TIMEZONE = "America/Sao_Paulo";
-export const TIMEZONE_OFFSET = "-03:00";
-export const SLOT_GRANULARITY_MINUTES = 5;
-export const DEFAULT_WHATSAPP_NUMBER = "5511996511471";
-
-const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
-
-export const auth = getAuth(app);
-export const db = getFirestore(app);
-export const firebaseApp = app;
-
-setPersistence(auth, browserLocalPersistence).catch((error) => {
-  console.warn("Não foi possível manter a sessão local no navegador.", error);
-});
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  const analytics = getAnalytics(app);
+</script>
