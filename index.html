@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Stilo Premium | Agendamento</title>
+  <meta name="description" content="Agende serviços na Stilo Premium com catálogo, carrinho e horários em tempo real." />
+  <meta name="theme-color" content="#0b0b0b" />
+  <link rel="icon" type="image/svg+xml" href="./assets/favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Cormorant+Garamond:wght@500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body class="site-page">
+  <div class="bg-noise" aria-hidden="true"></div>
+
+  <header class="site-header">
+    <div class="container nav-shell">
+      <a href="#home" class="brand" aria-label="Stilo Premium">
+        <span class="brand-mark">SP</span>
+        <span class="brand-copy">
+          <strong>Stilo Premium</strong>
+          <small>Barbearia premium</small>
+        </span>
+      </a>
+
+      <nav class="nav-links" aria-label="Navegação principal">
+        <a href="#services">Serviços</a>
+        <a href="#agendar">Agendar</a>
+        <a href="#footer">Contato</a>
+        <a href="./admin.html">Admin</a>
+      </nav>
+
+      <button class="btn btn-primary" data-scroll-target="#agendar">Agendar agora</button>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero-section" id="home">
+      <div class="container hero-grid">
+        <div class="hero-copy">
+          <span class="eyebrow">experiência premium • agenda inteligente</span>
+          <h1>Seu horário, seu estilo, sem atrito.</h1>
+          <p>
+            Escolha os serviços, monte o pedido, veja a duração total e reserve um horário real na agenda da
+            <strong>Stilo Premium</strong> com confirmação direta no WhatsApp.
+          </p>
+
+          <div class="hero-actions">
+            <button class="btn btn-primary" data-scroll-target="#agendar">Agendar agora</button>
+            <button class="btn btn-secondary" data-scroll-target="#services">Ver serviços</button>
+          </div>
+
+          <div class="hero-metrics" aria-label="Diferenciais da barbearia">
+            <article class="metric-card">
+              <strong>09:00 às 21:00</strong>
+              <span>Agenda inteligente com intervalos reais</span>
+            </article>
+            <article class="metric-card">
+              <strong>Pedido estilo app</strong>
+              <span>Carrinho com preço e duração total</span>
+            </article>
+            <article class="metric-card">
+              <strong>WhatsApp direto</strong>
+              <span>Resumo pronto para enviar ao Jhow</span>
+            </article>
+          </div>
+        </div>
+
+        <aside class="hero-panel premium-card">
+          <div class="hero-panel-head">
+            <span class="pill pill-gold">catálogo + carrinho + agenda</span>
+            <h2>Fluxo completo</h2>
+          </div>
+
+          <ol class="flow-list">
+            <li>Escolha os serviços</li>
+            <li>Veja total e duração</li>
+            <li>Selecione uma data</li>
+            <li>Reserve um horário disponível</li>
+            <li>Preencha seus dados</li>
+            <li>Finalize e abra o WhatsApp</li>
+          </ol>
+
+          <div class="hero-note">
+            <strong>1 profissional / 1 cadeira</strong>
+            <p>A agenda impede sobreposição e respeita o tempo exato de cada atendimento.</p>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="diferenciais-title">
+      <div class="container">
+        <div class="section-heading center">
+          <span class="eyebrow">alto padrão sem complicação</span>
+          <h2 id="diferenciais-title">Pensado para funcionar como um app real</h2>
+        </div>
+
+        <div class="feature-grid">
+          <article class="feature-card premium-card">
+            <h3>Visual premium</h3>
+            <p>Preto, grafite e dourado com interface rápida, legível e elegante no celular e no desktop.</p>
+          </article>
+          <article class="feature-card premium-card">
+            <h3>Disponibilidade real</h3>
+            <p>Os horários exibidos consideram o tempo exato do carrinho, não só blocos genéricos de 30 minutos.</p>
+          </article>
+          <article class="feature-card premium-card">
+            <h3>Painel administrativo</h3>
+            <p>Pedidos, agenda, serviços, bloqueios manuais e configurações em uma área reservada ao administrador.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="services" aria-labelledby="servicos-title">
+      <div class="container">
+        <div class="section-heading">
+          <div>
+            <span class="eyebrow">catálogo</span>
+            <h2 id="servicos-title">Serviços disponíveis</h2>
+            <p>Monte seu atendimento como um pedido. O sistema soma valor e duração automaticamente.</p>
+          </div>
+          <div class="legend-row">
+            <span class="pill">tempo real</span>
+            <span class="pill">preço total</span>
+            <span class="pill">1 cadeira</span>
+          </div>
+        </div>
+
+        <div id="servicesGrid" class="services-grid" aria-live="polite"></div>
+      </div>
+    </section>
+
+    <section class="section booking-section" id="agendar" aria-labelledby="agendamento-title">
+      <div class="container">
+        <div class="section-heading">
+          <div>
+            <span class="eyebrow">agendamento</span>
+            <h2 id="agendamento-title">Monte o pedido e reserve um horário</h2>
+            <p>O atendimento só aparece como disponível se o intervalo inteiro couber na agenda.</p>
+          </div>
+        </div>
+
+        <div class="wizard-pills" aria-label="Etapas do fluxo">
+          <span class="step-pill is-active">1. Serviços</span>
+          <span class="step-pill">2. Carrinho</span>
+          <span class="step-pill">3. Data e hora</span>
+          <span class="step-pill">4. Cliente</span>
+          <span class="step-pill">5. Confirmação</span>
+        </div>
+
+        <div class="booking-layout">
+          <section class="premium-card booking-panel booking-cart-panel" aria-labelledby="cart-title">
+            <div class="panel-head">
+              <div>
+                <span class="eyebrow">carrinho</span>
+                <h3 id="cart-title">Resumo do pedido</h3>
+              </div>
+              <button class="btn btn-tertiary btn-sm" id="clearCartBtn" type="button">Limpar</button>
+            </div>
+
+            <div id="cartContent" class="cart-content" aria-live="polite"></div>
+          </section>
+
+          <section class="premium-card booking-panel booking-date-panel" aria-labelledby="schedule-title">
+            <div class="panel-head">
+              <div>
+                <span class="eyebrow">etapa 1</span>
+                <h3 id="schedule-title">Escolha a data e o horário</h3>
+              </div>
+            </div>
+
+            <div class="field-group">
+              <label for="bookingDate">Data do atendimento</label>
+              <input id="bookingDate" class="input" type="date" />
+              <small class="field-help">Horário local: America/Sao_Paulo.</small>
+            </div>
+
+            <div class="availability-meta" id="availabilityMeta">
+              Selecione pelo menos um serviço para liberar a agenda.
+            </div>
+
+            <div id="timeSlots" class="time-slots" aria-live="polite"></div>
+          </section>
+
+          <section class="premium-card booking-panel booking-customer-panel" aria-labelledby="client-title">
+            <div class="panel-head">
+              <div>
+                <span class="eyebrow">etapa 2</span>
+                <h3 id="client-title">Seus dados</h3>
+              </div>
+            </div>
+
+            <form id="customerForm" class="form-grid" novalidate>
+              <div class="field-group field-span-2">
+                <label for="customerName">Nome completo</label>
+                <input id="customerName" class="input" type="text" maxlength="80" placeholder="Seu nome completo" required />
+              </div>
+
+              <div class="field-group field-span-2">
+                <label for="customerPhone">Telefone com WhatsApp</label>
+                <input id="customerPhone" class="input" type="tel" inputmode="numeric" maxlength="15" placeholder="(11) 99999-9999" required />
+              </div>
+
+              <div class="field-group field-span-2">
+                <label for="customerNotes">Observações</label>
+                <textarea id="customerNotes" class="textarea" rows="4" maxlength="240" placeholder="Ex.: prefiro navalhado baixo, sem risca."></textarea>
+              </div>
+            </form>
+          </section>
+
+          <section class="premium-card booking-panel booking-confirm-panel" aria-labelledby="confirm-title">
+            <div class="panel-head">
+              <div>
+                <span class="eyebrow">etapa 3</span>
+                <h3 id="confirm-title">Confirme o pedido</h3>
+              </div>
+            </div>
+
+            <div id="confirmationSummary" class="confirmation-summary"></div>
+
+            <button class="btn btn-primary btn-block" id="submitBookingBtn" type="button">
+              Finalizar e enviar no WhatsApp
+            </button>
+            <p class="submit-note">Ao finalizar, o pedido é salvo e o intervalo reservado na agenda.</p>
+          </section>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer" id="footer">
+    <div class="container footer-grid">
+      <div>
+        <h2>Stilo Premium</h2>
+        <p>Barbearia premium com catálogo, carrinho e agendamento inteligente.</p>
+      </div>
+
+      <div>
+        <h3>Contato</h3>
+        <ul class="footer-list">
+          <li><a href="https://wa.me/5511996511471" target="_blank" rel="noreferrer">WhatsApp: +55 11 99651-1471</a></li>
+          <li><span>Responsável: Jhow</span></li>
+          <li><span>Horário base: 09:00 às 21:00</span></li>
+        </ul>
+      </div>
+
+      <div>
+        <h3>Acesso</h3>
+        <ul class="footer-list">
+          <li><a href="./admin.html">Painel administrativo</a></li>
+          <li><a href="#home">Voltar ao topo</a></li>
+        </ul>
+      </div>
+    </div>
+  </footer>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <div id="loadingOverlay" class="loading-overlay" hidden>
+    <div class="loading-card premium-card">
+      <div class="spinner" aria-hidden="true"></div>
+      <p id="loadingText">Processando...</p>
+    </div>
+  </div>
+
+  <script type="module" src="./app.js"></script>
+</body>
+</html>

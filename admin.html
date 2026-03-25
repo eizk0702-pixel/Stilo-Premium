@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Stilo Premium | Painel Administrativo</title>
+  <meta name="description" content="Painel administrativo da Stilo Premium." />
+  <meta name="theme-color" content="#0b0b0b" />
+  <link rel="icon" type="image/svg+xml" href="./assets/favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Cormorant+Garamond:wght@500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body class="admin-page">
+  <div class="bg-noise" aria-hidden="true"></div>
+
+  <header class="admin-header">
+    <div class="container admin-header-shell">
+      <a href="./index.html" class="brand" aria-label="Stilo Premium">
+        <span class="brand-mark">SP</span>
+        <span class="brand-copy">
+          <strong>Stilo Premium</strong>
+          <small>Painel administrativo</small>
+        </span>
+      </a>
+
+      <div class="admin-actions">
+        <span class="admin-user-chip" id="adminUserChip">Sessão não iniciada</span>
+        <button class="btn btn-secondary btn-sm" id="backToSiteBtn" type="button">Voltar ao site</button>
+        <button class="btn btn-tertiary btn-sm hidden" id="logoutBtn" type="button">Sair</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="admin-main">
+    <div class="container">
+      <section class="login-wrap" id="loginView">
+        <div class="login-card">
+          <span class="eyebrow">acesso restrito</span>
+          <h1>Entrar no painel</h1>
+          <p>Somente administradores autenticados podem visualizar pedidos, agenda e configurações.</p>
+
+          <form id="loginForm" class="form-grid" novalidate>
+            <div class="field-group field-span-2">
+              <label for="loginEmail">E-mail</label>
+              <input id="loginEmail" class="input" type="email" autocomplete="username" placeholder="admin@stilopremium.com" required />
+            </div>
+
+            <div class="field-group field-span-2">
+              <label for="loginPassword">Senha</label>
+              <input id="loginPassword" class="input" type="password" autocomplete="current-password" placeholder="Sua senha" required />
+            </div>
+
+            <div class="field-span-2">
+              <button class="btn btn-primary btn-block" type="submit">Entrar</button>
+            </div>
+          </form>
+
+          <p class="auth-hint">
+            Depois de criar o usuário no Firebase Authentication, cadastre o documento <span class="mono">users/&lt;uid&gt;</span>
+            com <span class="mono">role: "admin"</span>.
+          </p>
+        </div>
+      </section>
+
+      <section id="adminApp" class="admin-layout hidden">
+        <div class="admin-topbar">
+          <div>
+            <span class="eyebrow">controle total</span>
+            <h2 class="section-title-md">Operação da agenda e pedidos</h2>
+          </div>
+
+          <div class="pills-row">
+            <span class="pill" id="currentDatePill">--</span>
+            <span class="pill" id="timezonePill">America/Sao_Paulo</span>
+          </div>
+        </div>
+
+        <nav class="admin-tabs" aria-label="Navegação do painel">
+          <button class="admin-tab-btn is-active" type="button" data-tab="dashboard">Dashboard</button>
+          <button class="admin-tab-btn" type="button" data-tab="agenda">Agenda</button>
+          <button class="admin-tab-btn" type="button" data-tab="pedidos">Pedidos</button>
+          <button class="admin-tab-btn" type="button" data-tab="services">Serviços</button>
+          <button class="admin-tab-btn" type="button" data-tab="settings">Configurações</button>
+        </nav>
+
+        <section class="admin-tab-panel is-active" data-panel="dashboard">
+          <div class="dashboard-grid" id="dashboardStats"></div>
+
+          <div class="detail-layout" style="margin-top: 18px;">
+            <article class="dashboard-card">
+              <div class="panel-head">
+                <h3>Próximos atendimentos</h3>
+                <span class="helper-text">Até 5 itens</span>
+              </div>
+              <div id="upcomingList"></div>
+            </article>
+
+            <article class="dashboard-card">
+              <div class="panel-head">
+                <h3>Pedidos pendentes</h3>
+                <span class="helper-text">Precisam de ação</span>
+              </div>
+              <div id="pendingList"></div>
+            </article>
+          </div>
+        </section>
+
+        <section class="admin-tab-panel" data-panel="agenda">
+          <article class="admin-card">
+            <div class="admin-section-head">
+              <div>
+                <span class="eyebrow">agenda</span>
+                <h2>Visualização diária</h2>
+              </div>
+
+              <div class="admin-toolbar">
+                <div class="field-group">
+                  <label for="agendaDate">Data</label>
+                  <input id="agendaDate" class="input" type="date" />
+                </div>
+
+                <button class="btn btn-secondary btn-sm" type="button" id="refreshAgendaBtn">Atualizar</button>
+                <button class="btn btn-tertiary btn-sm" type="button" id="exportAgendaBtn">Exportar dia</button>
+              </div>
+            </div>
+
+            <hr class="separator" />
+
+            <form id="manualBlockForm" class="config-grid" novalidate>
+              <div class="field-group">
+                <label for="blockDate">Data do bloqueio</label>
+                <input id="blockDate" class="input" type="date" required />
+              </div>
+
+              <div class="field-group">
+                <label for="blockStartTime">Início</label>
+                <input id="blockStartTime" class="input" type="time" step="300" required />
+              </div>
+
+              <div class="field-group">
+                <label for="blockEndTime">Término</label>
+                <input id="blockEndTime" class="input" type="time" step="300" required />
+              </div>
+
+              <div class="field-group">
+                <label for="blockReason">Motivo</label>
+                <input id="blockReason" class="input" type="text" maxlength="100" placeholder="Ex.: almoço, manutenção, folga." required />
+              </div>
+
+              <div class="field-span-2">
+                <button class="btn btn-primary" type="submit">Bloquear horário</button>
+              </div>
+            </form>
+
+            <hr class="separator" />
+
+            <div id="agendaTimeline" class="timeline-grid"></div>
+          </article>
+        </section>
+
+        <section class="admin-tab-panel" data-panel="pedidos">
+          <article class="admin-card">
+            <div class="admin-section-head">
+              <div>
+                <span class="eyebrow">pedidos</span>
+                <h2>Lista completa</h2>
+              </div>
+
+              <div class="pedidos-toolbar">
+                <div class="field-group">
+                  <label for="pedidosFilterDate">Filtrar por data</label>
+                  <input id="pedidosFilterDate" class="input" type="date" />
+                </div>
+
+                <div class="field-group">
+                  <label for="pedidosSearch">Buscar por nome ou telefone</label>
+                  <input id="pedidosSearch" class="input" type="search" placeholder="Ex.: João ou 1199999..." />
+                </div>
+              </div>
+            </div>
+
+            <div class="detail-layout">
+              <div class="table-card">
+                <div class="table-scroll">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>ID</th>
+                        <th>Cliente</th>
+                        <th>Telefone</th>
+                        <th>Data</th>
+                        <th>Início</th>
+                        <th>Término</th>
+                        <th>Duração</th>
+                        <th>Total</th>
+                        <th>Status</th>
+                        <th>Criado em</th>
+                      </tr>
+                    </thead>
+                    <tbody id="ordersTableBody"></tbody>
+                  </table>
+                </div>
+                <p class="table-note helper-text">Clique em uma linha para abrir os detalhes completos.</p>
+              </div>
+
+              <aside class="detail-card" id="orderDetailPanel">
+                <div class="drawer-head">
+                  <div>
+                    <strong class="detail-title">Detalhes do pedido</strong>
+                    <div class="detail-muted">Selecione um pedido na tabela.</div>
+                  </div>
+                  <button class="btn btn-tertiary btn-sm" type="button" id="copyOrderSummaryBtn">Copiar resumo</button>
+                </div>
+
+                <div id="orderDetailContent"></div>
+              </aside>
+            </div>
+          </article>
+        </section>
+
+        <section class="admin-tab-panel" data-panel="services">
+          <article class="admin-card">
+            <div class="admin-section-head">
+              <div>
+                <span class="eyebrow">serviços</span>
+                <h2>Catálogo editável</h2>
+              </div>
+
+              <div class="service-toolbar">
+                <button class="btn btn-primary btn-sm" type="button" id="openServiceModalBtn">Novo serviço</button>
+                <button class="btn btn-secondary btn-sm" type="button" id="seedServicesBtn">Restaurar serviços padrão</button>
+              </div>
+            </div>
+
+            <div id="servicesAdminGrid" class="service-grid"></div>
+          </article>
+        </section>
+
+        <section class="admin-tab-panel" data-panel="settings">
+          <article class="settings-card">
+            <div class="admin-section-head">
+              <div>
+                <span class="eyebrow">configurações</span>
+                <h2>Operação da barbearia</h2>
+              </div>
+            </div>
+
+            <form id="settingsForm" class="config-grid" novalidate>
+              <div class="field-group">
+                <label for="shopName">Nome da barbearia</label>
+                <input id="shopName" class="input" type="text" required />
+              </div>
+
+              <div class="field-group">
+                <label for="whatsappNumber">WhatsApp</label>
+                <input id="whatsappNumber" class="input" type="text" placeholder="5511996511471" required />
+              </div>
+
+              <div class="field-group">
+                <label for="businessHoursStart">Início do expediente</label>
+                <input id="businessHoursStart" class="input" type="time" required />
+              </div>
+
+              <div class="field-group">
+                <label for="businessHoursEnd">Fim do expediente</label>
+                <input id="businessHoursEnd" class="input" type="time" required />
+              </div>
+
+              <div class="field-group">
+                <label for="intervalMinutes">Intervalo base de horários</label>
+                <input id="intervalMinutes" class="input" type="number" min="5" step="5" required />
+              </div>
+
+              <div class="field-group">
+                <label>Fuso operacional</label>
+                <input class="input" type="text" value="America/Sao_Paulo" readonly />
+                <small class="field-help">Fuso fixado no sistema para manter agenda, interface e persistência consistentes.</small>
+              </div>
+
+              <div class="field-group field-span-2">
+                <label for="whatsappIntro">Mensagem inicial do WhatsApp</label>
+                <textarea id="whatsappIntro" class="textarea" rows="4"></textarea>
+              </div>
+
+              <div class="field-span-2 settings-actions">
+                <button class="btn btn-primary" type="submit">Salvar configurações</button>
+              </div>
+            </form>
+          </article>
+        </section>
+      </section>
+    </div>
+  </main>
+
+  <div class="modal" id="serviceModal" hidden>
+    <div class="modal-card">
+      <div class="modal-head">
+        <div>
+          <span class="eyebrow">serviço</span>
+          <h3 class="modal-title" id="serviceModalTitle">Novo serviço</h3>
+        </div>
+        <button class="btn btn-tertiary btn-sm" type="button" id="closeServiceModalBtn">Fechar</button>
+      </div>
+
+      <form id="serviceForm" class="config-grid" novalidate>
+        <input id="serviceId" type="hidden" />
+
+        <div class="field-group">
+          <label for="serviceName">Nome</label>
+          <input id="serviceName" class="input" type="text" maxlength="80" required />
+        </div>
+
+        <div class="field-group">
+          <label for="servicePrice">Preço</label>
+          <input id="servicePrice" class="input" type="number" min="0" step="0.01" required />
+        </div>
+
+        <div class="field-group">
+          <label for="serviceDuration">Duração (min)</label>
+          <input id="serviceDuration" class="input" type="number" min="5" step="5" required />
+        </div>
+
+        <div class="field-group">
+          <label for="serviceActive">Ativo</label>
+          <select id="serviceActive" class="select">
+            <option value="true">Sim</option>
+            <option value="false">Não</option>
+          </select>
+        </div>
+
+        <div class="field-group field-span-2">
+          <label for="serviceDescription">Descrição</label>
+          <textarea id="serviceDescription" class="textarea" rows="4" maxlength="180"></textarea>
+        </div>
+
+        <div class="field-span-2 row-actions">
+          <button class="btn btn-primary" type="submit">Salvar serviço</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <div id="loadingOverlay" class="loading-overlay" hidden>
+    <div class="loading-card premium-card">
+      <div class="spinner" aria-hidden="true"></div>
+      <p id="loadingText">Processando...</p>
+    </div>
+  </div>
+
+  <script type="module" src="./admin.js"></script>
+</body>
+</html>

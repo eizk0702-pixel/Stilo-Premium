@@ -1,0 +1,240 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return signedIn()
+        && exists(/databases/$(database)/documents/users/$(request.auth.uid))
+        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == "admin";
+    }
+
+    function hasExactKeys(requiredKeys) {
+      return request.resource.data.keys().hasAll(requiredKeys)
+        && request.resource.data.keys().hasOnly(requiredKeys);
+    }
+
+    function isIsoDate(value) {
+      return value is string
+        && value.size() == 10
+        && value.matches('^20\\d{2}-(0[1-9]|1[0-2])-([0][1-9]|[12][0-9]|3[01])$');
+    }
+
+    function isIsoTime(value) {
+      return value is string
+        && value.matches('^([01]\\d|2[0-3]):[0-5]\\d$');
+    }
+
+    function isBrazilPhoneDigits(value) {
+      return value is string
+        && value.matches('^[1-9]{2}(9\\d{8}|\\d{8})$');
+    }
+
+    function isTimestampField(value) {
+      return value is timestamp;
+    }
+
+    function isMinuteOfDay(value) {
+      return value is int && value >= 0 && value <= 1439;
+    }
+
+    function isPrice(value) {
+      return value is number && value > 0 && value <= 10000;
+    }
+
+    function isDuration(value) {
+      return value is int && value >= 5 && value <= 480 && value % 5 == 0;
+    }
+
+    function isValidPublicStatus(value) {
+      return value in ['pending', 'confirmed', 'completed', 'cancelled'];
+    }
+
+    function validCartItem(item) {
+      return item is map
+        && item.keys().hasAll(['id', 'name', 'price', 'durationMinutes'])
+        && item.keys().hasOnly(['id', 'name', 'price', 'durationMinutes'])
+        && item.id is string
+        && item.id.size() >= 1
+        && item.id.size() <= 60
+        && item.name is string
+        && item.name.size() >= 1
+        && item.name.size() <= 80
+        && isPrice(item.price)
+        && isDuration(item.durationMinutes);
+    }
+
+    function validCartItems(items) {
+      return items is list
+        && items.size() >= 1
+        && items.size() <= 8
+        && (items.size() < 1 || validCartItem(items[0]))
+        && (items.size() < 2 || validCartItem(items[1]))
+        && (items.size() < 3 || validCartItem(items[2]))
+        && (items.size() < 4 || validCartItem(items[3]))
+        && (items.size() < 5 || validCartItem(items[4]))
+        && (items.size() < 6 || validCartItem(items[5]))
+        && (items.size() < 7 || validCartItem(items[6]))
+        && (items.size() < 8 || validCartItem(items[7]));
+    }
+
+    function validLockId(lockId, date) {
+      return lockId is string
+        && lockId.size() == 15
+        && lockId.matches('^' + date + '_([01]\\d|2[0-3])[0-5]\\d$');
+    }
+
+    function validLockIds(lockIds, date, totalDurationMinutes) {
+      return lockIds is list
+        && lockIds.size() >= 1
+        && lockIds.size() <= 96
+        && isDuration(totalDurationMinutes)
+        && lockIds.size() == totalDurationMinutes / 5
+        && (lockIds.size() < 1 || validLockId(lockIds[0], date))
+        && (lockIds.size() < 2 || validLockId(lockIds[1], date))
+        && (lockIds.size() < 3 || validLockId(lockIds[2], date))
+        && (lockIds.size() < 4 || validLockId(lockIds[3], date))
+        && (lockIds.size() < 5 || validLockId(lockIds[4], date))
+        && (lockIds.size() < 6 || validLockId(lockIds[5], date))
+        && (lockIds.size() < 7 || validLockId(lockIds[6], date))
+        && (lockIds.size() < 8 || validLockId(lockIds[7], date))
+        && validLockId(lockIds[lockIds.size() - 1], date);
+    }
+
+    function representativeBookingLocksExist(bookingId) {
+      return existsAfter(/databases/$(database)/documents/scheduleLocks/$(request.resource.data.lockIds[0]))
+        && getAfter(/databases/$(database)/documents/scheduleLocks/$(request.resource.data.lockIds[0])).data.bookingId == bookingId
+        && getAfter(/databases/$(database)/documents/scheduleLocks/$(request.resource.data.lockIds[0])).data.date == request.resource.data.date
+        && getAfter(/databases/$(database)/documents/scheduleLocks/$(request.resource.data.lockIds[0])).data.startTime == request.resource.data.startTime
+        && getAfter(/databases/$(database)/documents/scheduleLocks/$(request.resource.data.lockIds[0])).data.endTime == request.resource.data.endTime
+        && (request.resource.data.lockIds.size() == 1 || (
+          existsAfter(/databases/$(database)/documents/scheduleLocks/$(request.resource.data.lockIds[request.resource.data.lockIds.size() - 1]))
+          && getAfter(/databases/$(database)/documents/scheduleLocks/$(request.resource.data.lockIds[request.resource.data.lockIds.size() - 1])).data.bookingId == bookingId
+          && getAfter(/databases/$(database)/documents/scheduleLocks/$(request.resource.data.lockIds[request.resource.data.lockIds.size() - 1])).data.date == request.resource.data.date
+          && getAfter(/databases/$(database)/documents/scheduleLocks/$(request.resource.data.lockIds[request.resource.data.lockIds.size() - 1])).data.startTime == request.resource.data.startTime
+          && getAfter(/databases/$(database)/documents/scheduleLocks/$(request.resource.data.lockIds[request.resource.data.lockIds.size() - 1])).data.endTime == request.resource.data.endTime
+        ));
+    }
+
+    function validBookingCreate(bookingId) {
+      return hasExactKeys([
+          'customerName',
+          'customerPhone',
+          'customerPhoneDigits',
+          'notes',
+          'date',
+          'startTime',
+          'endTime',
+          'startTimestamp',
+          'endTimestamp',
+          'startMinuteOfDay',
+          'endMinuteOfDay',
+          'items',
+          'totalPrice',
+          'totalDurationMinutes',
+          'status',
+          'source',
+          'timezone',
+          'lockIds',
+          'createdAt',
+          'updatedAt'
+        ])
+        && request.resource.data.customerName is string
+        && request.resource.data.customerName.size() >= 3
+        && request.resource.data.customerName.size() <= 80
+        && request.resource.data.customerPhone is string
+        && request.resource.data.customerPhone.size() >= 10
+        && request.resource.data.customerPhone.size() <= 20
+        && isBrazilPhoneDigits(request.resource.data.customerPhoneDigits)
+        && request.resource.data.notes is string
+        && request.resource.data.notes.size() <= 240
+        && isIsoDate(request.resource.data.date)
+        && isIsoTime(request.resource.data.startTime)
+        && isIsoTime(request.resource.data.endTime)
+        && isTimestampField(request.resource.data.startTimestamp)
+        && isTimestampField(request.resource.data.endTimestamp)
+        && isMinuteOfDay(request.resource.data.startMinuteOfDay)
+        && isMinuteOfDay(request.resource.data.endMinuteOfDay)
+        && request.resource.data.endMinuteOfDay > request.resource.data.startMinuteOfDay
+        && request.resource.data.endMinuteOfDay - request.resource.data.startMinuteOfDay == request.resource.data.totalDurationMinutes
+        && validCartItems(request.resource.data.items)
+        && isPrice(request.resource.data.totalPrice)
+        && isDuration(request.resource.data.totalDurationMinutes)
+        && request.resource.data.status == 'pending'
+        && request.resource.data.source == 'site'
+        && request.resource.data.timezone == 'America/Sao_Paulo'
+        && validLockIds(request.resource.data.lockIds, request.resource.data.date, request.resource.data.totalDurationMinutes)
+        && representativeBookingLocksExist(bookingId)
+        && request.resource.data.createdAt == request.time
+        && request.resource.data.updatedAt == request.time;
+    }
+
+    function validPublicLockCreate() {
+      return hasExactKeys([
+          'active',
+          'type',
+          'bookingId',
+          'date',
+          'time',
+          'slotGranularityMinutes',
+          'startTime',
+          'endTime',
+          'createdAt',
+          'updatedAt'
+        ])
+        && request.resource.data.active == true
+        && request.resource.data.type == 'booking'
+        && request.resource.data.bookingId is string
+        && request.resource.data.bookingId.size() >= 8
+        && request.resource.data.bookingId.size() <= 60
+        && isIsoDate(request.resource.data.date)
+        && isIsoTime(request.resource.data.time)
+        && isIsoTime(request.resource.data.startTime)
+        && isIsoTime(request.resource.data.endTime)
+        && request.resource.data.slotGranularityMinutes == 5
+        && request.resource.id.matches('^' + request.resource.data.date + '_([01]\\d|2[0-3])[0-5]\\d$')
+        && existsAfter(/databases/$(database)/documents/bookings/$(request.resource.data.bookingId))
+        && getAfter(/databases/$(database)/documents/bookings/$(request.resource.data.bookingId)).data.status == 'pending'
+        && getAfter(/databases/$(database)/documents/bookings/$(request.resource.data.bookingId)).data.source == 'site'
+        && getAfter(/databases/$(database)/documents/bookings/$(request.resource.data.bookingId)).data.date == request.resource.data.date
+        && getAfter(/databases/$(database)/documents/bookings/$(request.resource.data.bookingId)).data.startTime == request.resource.data.startTime
+        && getAfter(/databases/$(database)/documents/bookings/$(request.resource.data.bookingId)).data.endTime == request.resource.data.endTime
+        && request.resource.id in getAfter(/databases/$(database)/documents/bookings/$(request.resource.data.bookingId)).data.lockIds
+        && request.resource.data.createdAt == request.time
+        && request.resource.data.updatedAt == request.time;
+    }
+
+    match /services/{serviceId} {
+      allow read: if isAdmin() || resource.data.active == true;
+      allow create, update, delete: if isAdmin();
+    }
+
+    match /settings/{docId} {
+      allow read: if docId == 'general';
+      allow write: if isAdmin();
+    }
+
+    match /bookings/{bookingId} {
+      allow create: if validBookingCreate(bookingId);
+      allow read, update, delete: if isAdmin();
+    }
+
+    match /manualBlocks/{blockId} {
+      allow read, write: if isAdmin();
+    }
+
+    match /scheduleLocks/{lockId} {
+      allow read: if isAdmin() || resource.data.active == true;
+      allow create: if isAdmin() || validPublicLockCreate();
+      allow update, delete: if isAdmin();
+    }
+
+    match /users/{uid} {
+      allow read: if isAdmin() || (signedIn() && request.auth.uid == uid);
+      allow write: if isAdmin();
+    }
+  }
+}
