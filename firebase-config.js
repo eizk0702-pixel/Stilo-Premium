@@ -1,6 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
 import { getAuth } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
-import { getFirestore } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+import { initializeFirestore } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 
 export const firebaseConfig = {
   apiKey: "AIzaSyD9zO7KYM7ALgLnzgdZr3IiiJyu1M-aYWk",
@@ -13,7 +13,11 @@ export const firebaseConfig = {
 
 export const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
-export const db = getFirestore(app);
+
+// usa autodetecção de long polling para ambientes onde proxy, antivírus ou extensão quebram o canal realtime
+export const db = initializeFirestore(app, {
+  experimentalAutoDetectLongPolling: true
+});
 
 export const TIMEZONE = "America/Sao_Paulo";
 export const TIMEZONE_OFFSET = "-03:00";
