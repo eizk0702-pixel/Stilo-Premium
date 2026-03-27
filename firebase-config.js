@@ -1,3 +1,7 @@
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+import { getAuth } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+import { getFirestore } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+
 export const firebaseConfig = {
   apiKey: "AIzaSyD9zO7KYM7ALgLnzgdZr3IiiJyu1M-aYWk",
   authDomain: "stilo-premium.firebaseapp.com",
@@ -6,6 +10,10 @@ export const firebaseConfig = {
   messagingSenderId: "998169786088",
   appId: "1:998169786088:web:435a0724bcd5bda9547b5d"
 };
+
+export const app = initializeApp(firebaseConfig);
+export const auth = getAuth(app);
+export const db = getFirestore(app);
 
 export const TIMEZONE = "America/Sao_Paulo";
 export const TIMEZONE_OFFSET = "-03:00";
