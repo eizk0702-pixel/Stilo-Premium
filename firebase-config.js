@@ -8,5 +8,6 @@ export const firebaseConfig = {
 };
 
 export const TIMEZONE = "America/Sao_Paulo";
+export const TIMEZONE_OFFSET = "-03:00";
 export const SLOT_GRANULARITY_MINUTES = 5;
 export const DEFAULT_WHATSAPP_NUMBER = "5511996511471";
